@@ -4,7 +4,7 @@ describe "Micropost pages" do
 
   subject { page }
 
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryGirl.create(:user, name: "user1") }
   before { sign_in user }
 
   describe "micropost creation" do
@@ -40,5 +40,21 @@ describe "Micropost pages" do
               expect { click_link "delete" }.to change(Micropost, :count).by(-1)
         end
      end
+        
+        describe "as a different user" do
+            before do
+            @user = FactoryGirl.create(:user, name: "Example User")
+            FactoryGirl.create(:micropost, user: @user, content: "Foo")
+            end
+            
+            let(:user) { FactoryGirl.create(:user) }
+            before do
+                sign_in user
+                visit users_path
+                click_link "Example User"
+            end
+            
+            it { should_not have_content("delete") }
+        end
    end
 end

@@ -31,6 +31,41 @@ describe "Static pages" do
           expect(page).to have_selector("li##{item.id}", text: item.content)
         end
       end
+         
+        describe "micropost count" do
+           before do
+               user.feed.delete_all
+               fill_in "micropost_content", with: "This is my micropost"
+               click_button "Post"
+               visit root_path
+            end
+            
+            it { should have_content("micropost") }
+            before do
+               fill_in "micropost_content", with: "This is my micropost2"
+               click_button "Post"
+            end
+            it { should have_content("2 microposts") }
+            
+            
+        end
+         
+      describe "pagination" do
+        let(:user) { FactoryGirl.create(:user) }
+          before do
+            30.times { FactoryGirl.create(:micropost, user: user, content: "this is a nice micropost") }
+            sign_in user
+            visit root_path
+          end          
+          
+            it { should have_selector('div.pagination') }
+            
+            it "should list each micropost" do
+                user.feed.paginate(page: 1).each do |micropost|
+                    expect(page).to have_selector('li', text: micropost.content)
+                end
+            end
+        end
     end
   end
 
