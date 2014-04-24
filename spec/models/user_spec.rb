@@ -185,4 +185,20 @@ it { should eq found_user.authenticate(@user.password) }
             its(:followed_users) { should_not include(other_user) }
         end
      end
+    
+    describe "relationship associations" do
+        let(:other_user) { FactoryGirl.create(:user) }
+         before do
+            @user.save
+            @user.follow!(other_user)
+            other_user.follow!(@user)
+         end
+        
+        subject { other_user }
+        
+        before { @user.destroy }
+        
+        its(:relationships) { should_not include(@user) }
+        its(:reverse_relationships) { should_not include(@user) }
+    end
 end

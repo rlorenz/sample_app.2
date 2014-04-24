@@ -72,8 +72,9 @@ describe "UserPages" do
         
         describe "follow/unfollow buttons" do
       let(:other_user) { FactoryGirl.create(:user) }
-      before { sign_in user }
-
+            
+     before { sign_in user }
+            
       describe "following a user" do
         before { visit user_path(other_user) }
 
@@ -94,6 +95,28 @@ describe "UserPages" do
           it { should have_xpath("//input[@value='Unfollow']") }
         end
       end
+            
+        describe "user stats page" do
+            describe "following and being followed" do
+                before do
+                    other_user.follow!(user)
+                    user.follow!(other_user)
+                    visit root_path
+                end
+                it { should have_content("1 following") }
+                it { should have_content("1 followers") }
+                describe "unfollowing and being unfollowed" do
+                    before do
+                        other_user.unfollow!(user)
+                        user.unfollow!(other_user)
+                        visit root_path
+                    end
+                    it { should have_content("0 following") }
+                    it { should have_content("0 followers") }
+                end
+            end
+        end
+                
 
       describe "unfollowing a user" do
         before do
